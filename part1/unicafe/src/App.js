@@ -89,16 +89,19 @@ const App = () => {
 
   const handleSetGoodClick = () => {
     setGood(good + 1)
-    setAll(all.concat(1))
+    const allCopy = [...all]
+    setAll(allCopy.concat(1))
   }
 
   const handleSetNeutralClick = () => {
     setNeutral(neutral + 1)
-    setAll(all.concat(0))
+    const allCopy = [...all]
+    setAll(allCopy.concat(0))
   }
   const handleSetBadClick = () => {
     setBad(bad + 1)
-    setAll(all.concat(-1))
+    const allCopy = [...all]
+    setAll(allCopy.concat(-1))
   }
 
   return (
