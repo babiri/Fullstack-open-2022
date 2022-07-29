@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
@@ -22,9 +22,9 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     const personsArray = persons.map(person => person.name)
-    if (personsArray.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
-    }
+    // if (personsArray.includes(newName)) {
+    //   alert(`${newName} is already added to phonebook`)
+    // }
     const personObject = {
       id: persons.length + 1,
       name: newName,
@@ -35,11 +35,25 @@ const App = () => {
     } else {
       personService
         .create(personObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson));
+        .then(createdPerson => {
+          setPersons(persons.concat(createdPerson));
           setNewName('')
           setNewNumber('')
         })
+    }
+  }
+
+  const deletePerson = person => {
+    if (window.confirm(`Delete '${person.name}'?`)) {
+      personService
+        .deleteEntry(person.id)
+        // .then(() => setPersons(person.filter(n => n.id !== id)))
+        // .catch(error => {
+        //   alert(
+        //     `the person '${person.name}' with the number '${person.number}' was already deleted`
+        //   )
+          setPersons(persons.filter(n => n.id !== person.id))
+        // })
     }
   }
 
@@ -67,7 +81,7 @@ const App = () => {
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h3>Add a new</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} deletePerson={deletePerson} />
     </div>
   )
 }
