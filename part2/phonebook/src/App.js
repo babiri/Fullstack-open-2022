@@ -48,11 +48,22 @@ const App = () => {
         .update(id, changedPerson)
         .then(returnedPerson => {
           setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+          setNewName('')
+          setNewNumber('')
           setSuccessMessage(
             `Updated ${personObject.name}'s number`
           )
           setTimeout(() => {
             setSuccessMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage(
+            `Information of ${person.name} has already been removed from server`
+          )
+          setPersons(persons.filter(n => n.id !== person.id))
+          setTimeout(() => {
+            setErrorMessage(null)
           }, 5000)
         })
     }
@@ -62,7 +73,24 @@ const App = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .deleteEntry(person.id)
-      setPersons(persons.filter(n => n.id !== person.id))
+        .then((personObject) => {
+          setSuccessMessage(
+            `Deleted ${person.name}`
+          );
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage(
+            `Information of ${person.name} has already been removed from server`
+          )
+          setPersons(persons.filter(n => n.id !== person.id))
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+        setPersons(persons.filter(n => n.id !== person.id))
     }
   }
 
