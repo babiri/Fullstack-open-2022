@@ -19,41 +19,35 @@ const App = () => {
       })
   }, [])
 
-  const addPerson = (event) => {
-    event.preventDefault()
-    const personsArray = persons.map(person => person.name)
-    // if (personsArray.includes(newName)) {
-    //   alert(`${newName} is already added to phonebook`)
-    // }
-    const personObject = {
-      id: persons.length + 1,
-      name: newName,
-      number: newNumber
-    }
-    if (personsArray.includes(newName)) {
-      alert(`${newName} is already added to phonebook`);
-    } else {
+  const addPerson = (personObject) => {
+    personService
+      .create(personObject)
+      .then(createdPerson => {
+        setPersons(persons.concat(createdPerson));
+        setNewName('')
+        setNewNumber('')
+      })
+  }
+
+  const updatePerson = personObject => {
+    const person = persons.find(n => n.name === personObject.name)
+    const id = person.id
+    const changedPerson = { ...person, number: personObject.number }
+
+    if (window.confirm(`${personObject.name} is already added to phonebook, replace the old number with the new one?`)) {
       personService
-        .create(personObject)
-        .then(createdPerson => {
-          setPersons(persons.concat(createdPerson));
-          setNewName('')
-          setNewNumber('')
+        .update(id, changedPerson)
+        .then(returnedPerson => {
+          setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
         })
     }
   }
 
   const deletePerson = person => {
-    if (window.confirm(`Delete '${person.name}'?`)) {
+    if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .deleteEntry(person.id)
-        // .then(() => setPersons(person.filter(n => n.id !== id)))
-        // .catch(error => {
-        //   alert(
-        //     `the person '${person.name}' with the number '${person.number}' was already deleted`
-        //   )
-          setPersons(persons.filter(n => n.id !== person.id))
-        // })
+      setPersons(persons.filter(n => n.id !== person.id))
     }
   }
 
@@ -61,6 +55,18 @@ const App = () => {
     ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
     : persons
 
+  const handlePersonForm = (event) => {
+    event.preventDefault()
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      // id: persons.length + 1
+    }
+    const personsArray = persons.map(person => person.name)
+    personsArray.includes(personObject.name)
+      ? updatePerson(personObject)
+      : addPerson(personObject)
+  }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -80,7 +86,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h3>Add a new</h3>
-      <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
+      <PersonForm handlePersonForm={handlePersonForm} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
       <Persons persons={personsToShow} deletePerson={deletePerson} />
     </div>
   )
