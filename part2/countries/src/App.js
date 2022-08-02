@@ -1,38 +1,41 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Country = ({ country, handleShow }) => {
+const Country = ({ country, showCountryInfo }) => {
   return (
     <>
-      {country.name.common} <button onClkick={ handleShow }>show</button>
+      {country.name.common} <button onClick={showCountryInfo}>show</button>
       <br />
     </>
   )
 }
 
-const CountryInfo = ({ country }) => {
-  const countryLanguages = Object.values(country.languages)
-  return (
-    <>
-      <h2>{ country.name.common }</h2>
-      capital {country.capital}
-      <br />
-      area {country.area}
-      <br />
-      <br />
-      <h2>languages:</h2>
-      <ul>
-        {countryLanguages.map(language => <li>{language}</li>)}
-      </ul>
-      <img src={country.flags['png']} alt={country.name.common} />
-    </>
-  )
+const CountryInfo = ({ country, showInfo }) => {
+  if (showInfo) {
+    const countryLanguages = Object.values(country.languages)
+    return (
+      <>
+        <h2>{ country.name.common }</h2>
+        capital {country.capital}
+        <br />
+        area {country.area}
+        <br />
+        <br />
+        <h2>languages:</h2>
+        <ul>
+          {countryLanguages.map(language => <li key={language}>{language}</li>)}
+        </ul>
+        <img src={country.flags['png']} alt={country.name.common} />
+      </>
+    )
+  }
 }
 
-const Countries = ({ countries, filter }) => {
+const Countries = ({ countries, filter, showCountryInfo, shownCountry }) => {
   const filteredCountries =
     countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
-
+  const isEmpty = Object.keys(shownCountry).length === 0
+  const showInfo = isEmpty ? false : true
   if (filter.length === 0) {
     return (<>enter filter</>)
   }
@@ -43,17 +46,19 @@ const Countries = ({ countries, filter }) => {
   }
   if (filteredCountries.length === 1) {
     return (
-      <CountryInfo country={countries[0]} />
+      <CountryInfo country={countries[0]} showInfo={true} />
     )
   }
 
-    if (filter)
-      return (
-        <>
-          {countries.map(country =>
-            <Country key={country.name.common} country={country} />
-          )}
-        </>)
+  if (filter) {
+    return (
+      <>
+        {countries.map(country =>
+          <Country key={country.name.common} country={country} showCountryInfo={() => showCountryInfo(country) } />
+        )}
+        <CountryInfo country={shownCountry} showInfo={showInfo} />
+      </>)
+  }
 }
 
 const Filter = ({ filter, handleFilterChange }) => {
@@ -81,19 +86,20 @@ function App() {
     ? countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
     : countries
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value)
+  const showCountryInfo = (country) => {
+    setShownCountry(country)
   }
 
-  const handleShow = (event) => {
-    setShownCountry(event.target.value)
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value)
+    setShownCountry({})
   }
 
   return (
     <div>
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <br />
-      <Countries countries={countriesToShow} filter={filter} handleShow={handleShow} />
+      <Countries countries={countriesToShow} filter={filter} showCountryInfo={showCountryInfo} shownCountry={shownCountry}/>
     </div>
   );
 }
