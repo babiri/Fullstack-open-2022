@@ -57,9 +57,15 @@ const generateId = () => getRandomInt(1, 10000000);
 
 app.post('/api/persons', (request, response) => {
   const query = request.query;
+  const personsNames = persons.map(person => person.name)x
+  const existingPerson = personsNames.find(p => p === query.name)
   if (!query.name || !query.number) {
     return response.status(400).json({
-      error: 'content missing'
+      error: 'name/number can not be blank'
+    })
+  } else if (existingPerson) {
+    return response.status(400).json({
+      error: 'name must be unique'
     })
   }
   const randomId = generateId()
@@ -70,7 +76,6 @@ app.post('/api/persons', (request, response) => {
   }
 
   persons = persons.concat(person);
-
   response.json(person);
 })
 
