@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 let persons = [
@@ -25,6 +26,7 @@ let persons = [
 ]
 
 app.use(express.json())
+app.use(morgan('tiny'));
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -57,7 +59,7 @@ const generateId = () => getRandomInt(1, 10000000);
 
 app.post('/api/persons', (request, response) => {
   const query = request.query;
-  const personsNames = persons.map(person => person.name)x
+  const personsNames = persons.map(person => person.name)
   const existingPerson = personsNames.find(p => p === query.name)
   if (!query.name || !query.number) {
     return response.status(400).json({
