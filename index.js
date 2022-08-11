@@ -1,6 +1,6 @@
-const express = require('express')
-const morgan = require('morgan')
-const app = express()
+const express = require('express');
+const morgan = require('morgan');
+const app = express();
 
 let persons = [
   { 
@@ -25,8 +25,8 @@ let persons = [
   }
 ]
 
-app.use(express.json())
-app.use(morgan('tiny'));
+app.use(express.json());
+app.use(morgan(':method :url :body'));
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -57,28 +57,30 @@ const getRandomInt = (min, max) => {
 
 const generateId = () => getRandomInt(1, 10000000);
 
-app.post('/api/persons', (request, response) => {
-  const query = request.query;
-  const personsNames = persons.map(person => person.name)
-  const existingPerson = personsNames.find(p => p === query.name)
-  if (!query.name || !query.number) {
-    return response.status(400).json({
+const existsInArray = (array, name) => array.find(item => item.name === name) 
+
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+  console.log(req.headers);
+
+  if (!body.name || !body.number) {
+
+    return res.status(400).json({
       error: 'name/number can not be blank'
     })
-  } else if (existingPerson) {
-    return response.status(400).json({
+  } else if (existsInArray(persons, body.name)) {
+    return res.status(400).json({
       error: 'name must be unique'
     })
   }
-  const randomId = generateId()
   const person = {
-    name: query.name,
-    number: query.number,
-    id: randomId
+    name: body.name,
+    number: body.number,
+    id: generateId()
   }
-
+  morgan.token('body', request => JSON.stringify(body))
   persons = persons.concat(person);
-  response.json(person);
+  res.json(person);
 })
 
 app.delete('/api/persons/:id', (request, response) => {
