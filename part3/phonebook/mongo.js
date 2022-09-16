@@ -7,7 +7,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2];
 
-const url = `mongodb+srv://ppomes:${password}@cluster0.i2phu33.mongodb.net/phonebookApp?retryWrites=true&w=majority`;
+const url = `mongodb+srv://ppomes:${password}@cluster0.et7oxta.mongodb.net/?retryWrites=true&w=majority`;
 
 const personSchema = new mongoose.Schema({
   name: String,
@@ -50,14 +50,3 @@ if ((process.argv.length) === 5) {
       })
     })
 }
-
-// console.log('fetching results');
-
-// Person.find({name: "Ricardo"}).then(result => {
-//   console.log(result);
-  
-//   result.forEach(person => {
-//     console.log(person.name)
-//   })
-//   mongoose.connection.close()
-// })
