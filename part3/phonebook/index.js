@@ -1,13 +1,13 @@
 require('dotenv').config()
-const express = require('express');
-const morgan = require('morgan');
-const cors = require('cors');
+const express = require('express')
+const morgan = require('morgan')
+const cors = require('cors')
 const Person = require('./models/person')
 
-const app = express();
+const app = express()
 
 app.use(express.static('build'))
-app.use(express.json());
+app.use(express.json())
 morgan.token('body', req => {
   if (req.body) {
     return JSON.stringify(req.body)
@@ -15,8 +15,8 @@ morgan.token('body', req => {
     return '-'
   }
 })
-app.use(morgan(':method :url :body'));
-app.use(cors());
+app.use(morgan(':method :url :body'))
+app.use(cors())
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
@@ -32,7 +32,7 @@ app.get('/api/persons/:id', (request, response, next) => {
       } else {
         response.status(404).end()
       }})
-     .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
@@ -52,7 +52,7 @@ app.get('/info', (request, response) => {
 
 // const generateId = () => getRandomInt(1, 10000000);
 
-const existsInArray = (array, name) => array.find(item => item.name === name) 
+const existsInArray = (array, name) => array.find(item => item.name === name)
 
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
@@ -75,13 +75,13 @@ app.post('/api/persons', (req, res, next) => {
   })
   person.save()
     .then(savedPerson => {
-      res.json(savedPerson);
+      res.json(savedPerson)
     })
     .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const body = request.body;
+  const body = request.body
 
   const person = {
     number: body.number
@@ -112,7 +112,7 @@ app.delete('/api/persons/:id', (request, response) => {
 
 const errorHandler = (error, request, response, next) => {
   // console.log(error);
-  console.log(error.message);
+  console.log(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
