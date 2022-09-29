@@ -55,10 +55,15 @@ const App = () => {
       }
     }
 
-    personService.create(newPerson).then(savedPerson => {
-      setPersons(persons.concat(savedPerson))
-      notify(`Added ${savedPerson.name}`)
-    })
+    personService
+      .create(newPerson)
+      .then(savedPerson => {
+        setPersons(persons.concat(savedPerson))
+        notify(`Added ${savedPerson.name}`)
+      })
+      .catch(error => {
+        notify(error.response.data.error, 'alert')
+      })
   }
 
   const deletePerson = (id) => { 
@@ -68,7 +73,7 @@ const App = () => {
       personService.remove(id).then(() => {
         setPersons(persons.filter(p => p.id !== id))
         notify(`Deleted ${toDelete.name}`)
-      })  
+      })
     }
   }
  
