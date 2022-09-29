@@ -12,6 +12,10 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
   });
 
+const validatePhoneNumber = value => {
+  return '/\d{2,3}[-]\d+/gm'.test(value)
+}
+
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -19,8 +23,15 @@ const personSchema = new mongoose.Schema({
     required: true
   },
   number: {
-    type: Number,
-    required: true
+    type: String,
+    minLength: 8,
+    required: true,
+    validate: {
+      validator:  function(value) {
+        return /\d{2,3}[-]\d+/gm.test(value)
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    }
   }
 });
 
